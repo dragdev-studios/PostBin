@@ -118,6 +118,9 @@ def postSync(content: str, *, url: str = None, retry: int = 5):
             response = session.post(url+"/documents", data=content)
             if response.status_code != 200:
                 raise ResponseError(response)
+            elif response.headers.get("Content-Type", "").lower() != "application/json":
+                print(url, "is returning an invalid response. Finding a Fallback")
+                return postSync(content, url=findFallBackSync(True))
             key = response.json()["key"]
         except requests.ConnectionError:
             print(url, "is unable. Finding a fallback...")
@@ -140,6 +143,9 @@ async def postAsync(content: str, *, url: str = None, retry: int = 5):
             async with session.post(url+"/documents", data=content) as response:
                 if response.status != 200:
                     raise ResponseError(response)
+                elif response.headers.get("Content-Type", "").lower() != "application/json":
+                    print(url, "is returning an invalid response. Finding a Fallback")
+                    return await postAsync(content, url=await findFallBackAsync(True))
                 key = (await response.json())["key"]
         except aiohttp.ClientConnectionError:
             print(url, "is unable. Finding a fallback...")
