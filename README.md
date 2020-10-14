@@ -10,6 +10,16 @@ A simple package that allows you to post to haste services.
 There's no real need for a full-fledged module for simply creating pastes. So, I think a quick 2 function module
 does the trick far easier.
 
+## Installing
+from pip: 
+```shell script
+$ [python3 -m] pip install postbin
+```
+or from git:
+```shell script
+$ [python3 -m] pip install git+https://github.com/dragdev-studios/PostBin.git
+```
+
 ## Execution
 from within a script:
 ```python
