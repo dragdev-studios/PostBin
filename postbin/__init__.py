@@ -119,7 +119,7 @@ def postSync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_
             response = session.post(url+"/documents", data=content)
             if response.status_code == 503:
                 print(url, "is unavailable. Finding a fallback...")
-                return await postAsync(content, url=await findFallBackAsync(True))
+                return postSync(content, url=findFallBackSync(True))
             if response.status_code != 200:
                 raise ResponseError(response)
             elif response.headers.get("Content-Type", "").lower() != "application/json":
@@ -133,7 +133,7 @@ def postSync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_
             if retry <= 0:
                 if find_fallback_on_retry_runout:
                     print(url, "is unavailable. Finding a fallback...")
-                    return await postAsync(content, url=await findFallBackAsync(True))
+                    return postSync(content, url=findFallBackSync(True))
                 raise NoMoreRetries()
             print(f"Error posting. {retry-1} retries left.")
             retry -= 1
