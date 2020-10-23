@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='PostBin',
-    version='1.0.3a',
+    version='1.0.3a1',
     packages=['postbin'],
     url='',
     license='MIT',
