@@ -119,25 +119,25 @@ def postSync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_
             response = session.post(url+"/documents", data=content)
             if response.status_code == 503:
                 print(url, "is unavailable. Finding a fallback...")
-                return postSync(content, url=findFallBackSync(True))
+                return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
             if response.status_code != 200:
                 raise ResponseError(response)
             elif response.headers.get("Content-Type", "").lower() != "application/json":
                 print(url, "is returning an invalid response. Finding a Fallback")
-                return postSync(content, url=findFallBackSync(True))
+                return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
             key = response.json()["key"]
         except requests.ConnectionError:
             print(url, "is unable. Finding a fallback...")
-            return postSync(content, url=findFallBackSync(True))
+            return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
         except Exception as e:
             if retry <= 0:
                 if find_fallback_on_retry_runout:
                     print(url, "is unavailable. Finding a fallback...")
-                    return postSync(content, url=findFallBackSync(True))
+                    return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
                 raise NoMoreRetries()
             print(f"Error posting. {retry-1} retries left.")
             retry -= 1
-            return postSync(content, url=url, retry=retry)
+            return postSync(content, url=url, retry=retry, find_fallback_on_retry_runout=True)
     return url+"/"+key
 
 async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
@@ -150,26 +150,26 @@ async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallb
             async with session.post(url+"/documents", data=content) as response:
                 if response.status == 503:
                     print(url, "is unavailable. Finding a fallback...")
-                    return await postAsync(content, url=await findFallBackAsync(True))
+                    return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
                 if response.status != 200:
                     raise ResponseError(response)
                 elif response.headers.get("Content-Type", "").lower() != "application/json":
                     print(url, "is returning an invalid response. Finding a Fallback")
-                    return await postAsync(content, url=await findFallBackAsync(True))
+                    return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
                 key = (await response.json())["key"]
         except aiohttp.ClientConnectionError:
             print(url, "is unavailable. Finding a fallback...")
-            return await postAsync(content, url=await findFallBackAsync(True))
+            return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
         except Exception as e:
             print(e)
             if retry <= 0:
                 if find_fallback_on_retry_runout:
                     print(url, "is unavailable. Finding a fallback...")
-                    return await postAsync(content, url=await findFallBackAsync(True))
+                    return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
                 raise NoMoreRetries()
             print(f"Error posting. {retry-1} retries left.")
             retry -= 1
-            return await postAsync(content, url=url, retry=retry)
+            return await postAsync(content, url=url, retry=retry, find_fallback_on_retry_runout=True)
     return url+"/"+key
 
 # def getSync(url: str):
