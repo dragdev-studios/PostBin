@@ -82,7 +82,7 @@ async def findFallBackAsync(verbose: bool = True):
             if verbose:
                 print(f"Trying service {n}/{len(_FALLBACKS)}",end="\r")
             try:
-                async with session.post(url, data="") as response:
+                async with session.post(url+"/documents", data="") as response:
                     if response.status != 200:
                         continue
                     else:
