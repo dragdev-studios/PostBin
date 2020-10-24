@@ -19,7 +19,6 @@ import asyncio
 
 _FALLBACKS = [
     "https://hastebin.com",
-    "https://mystbin.com",
     "https://paste.pythondiscord.com",
     "https://haste.unbelievaboat.com"
 ]
