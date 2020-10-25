@@ -19,9 +19,9 @@ import asyncio
 
 _FALLBACKS = [
     "https://hastebin.com",
-    "https://mystbin.com",
     "https://paste.pythondiscord.com",
-    "https://haste.unbelievaboat.com"
+    "https://haste.unbelievaboat.com",
+    "https://mystb.in"
 ]
 _HASTE_URLS_FOR_REGEX = '|'.join(_FALLBACKS[8:]).replace(".", "\\.")
 _HASTE_URLS_RAW = "(https://|http://)?({})/(raw/)?(?P<key>.+)".format(_HASTE_URLS_FOR_REGEX)
@@ -82,7 +82,7 @@ async def findFallBackAsync(verbose: bool = True):
             if verbose:
                 print(f"Trying service {n}/{len(_FALLBACKS)}",end="\r")
             try:
-                async with session.post(url, data="") as response:
+                async with session.post(url+"/documents", data="") as response:
                     if response.status != 200:
                         continue
                     else:
