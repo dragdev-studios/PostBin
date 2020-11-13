@@ -102,19 +102,19 @@ async def findFallBackAsync(verbose: bool = True):
     return url
 
 # noinspection PyIncorrectDocstring
-def postSync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
+def postSync(content: typing.Optional[str, list], *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
     """
     Creates a new haste
 
-    :param content:
-    :keyword url: the custom URL to post to. Defaults to HasteBin. If this is a list, it will join with a newline.
+    :param content: the content to post to hastebin. If this is a list, it will join with a newline.
+    :keyword url: the custom URL to post to. Defaults to HasteBin.
     :keyword retry: the number of times to retry. Pass `0` to disable
     :keyword find_fallback_on_retry_runout: if True, instead of raising NoMoreRetries(), find a fallback instead.
     :return: the returned URL
     """
     if not requests:
         raise RuntimeError("requests must be installed if you want to be able to run postSync.")
-    if type(content) == list:
+    if isinstance(content, str):
         content = "\n".join(content)
     url = url or "https://hastebin.com"
     with requests.Session() as session:
@@ -143,11 +143,11 @@ def postSync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_
             return postSync(content, url=url, retry=retry, find_fallback_on_retry_runout=True)
     return url+"/"+key
 
-async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
+async def postAsync(content: typing.Optional[str, list], *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
     """The same as :func:postSync, but async."""
     if not aiohttp:
         raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
-    if type(content) == list:
+    if isinstance(content, str):
         content = "\n".join(content)
     url = url or "https://hastebin.com"
     async with aiohttp.ClientSession() as session:
