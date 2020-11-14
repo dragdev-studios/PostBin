@@ -102,7 +102,7 @@ async def findFallBackAsync(verbose: bool = True):
     return url
 
 # noinspection PyIncorrectDocstring
-def postSync(content: typing.Optional[str, list], *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
+def postSync(content: typing.Optional[typing.Union[str, list]], *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
     """
     Creates a new haste
 
@@ -145,7 +145,7 @@ def postSync(content: typing.Optional[str, list], *, url: str = None, retry: int
             return postSync(content, url=url, retry=retry, find_fallback_on_retry_runout=True)
     return url+"/"+key
 
-async def postAsync(content: typing.Optional[str, list], *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
+async def postAsync(content: typing.Optional[typing.Union[str, list]], *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
     """The same as :func:postSync, but async."""
     if not aiohttp:
         raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
