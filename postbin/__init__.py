@@ -1,3 +1,11 @@
+## Note to editors and future/current contributors:  ##
+# this file is very messy.                            #
+# Any contributions to tidying it up would be greatly #
+# appriciated.                                        #
+#                                                     #
+# - eek                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 import typing
 import re
 
@@ -16,6 +24,8 @@ except ImportError:
     CR = None
 import time
 import asyncio
+__import__("logging").info("PostBin v2 is now in development. If you would prefer a more OOP style postbin, consider using"
+                           " \"postbin.v2\".")
 
 _FALLBACKS = [
     "https://hastebin.com",
@@ -24,9 +34,11 @@ _FALLBACKS = [
     "https://mystb.in",
     "https://hst.sh"
 ]
-_HASTE_URLS_FOR_REGEX = '|'.join(_FALLBACKS[8:]).replace(".", "\\.")
-_HASTE_URLS_RAW = "(https://|http://)?({})/(raw/)?(?P<key>.+)".format(_HASTE_URLS_FOR_REGEX)
-_HASTE_REGEX = re.compile(_HASTE_URLS_RAW)
+#_HASTE_URLS_FOR_REGEX = '|'.join(_FALLBACKS[8:]).replace(".", "\\.")
+# _HASTE_URLS_RAW = "(https://|http://)?({})/(raw/)?(?P<key>.+)".format(_HASTE_URLS_FOR_REGEX)
+# _HASTE_REGEX = re.compile(_HASTE_URLS_RAW)
+
+# we don't need the above anymore - Will be removed in the future.
 
 
 class ResponseError(Exception):
@@ -101,20 +113,27 @@ async def findFallBackAsync(verbose: bool = True):
             raise NoFallbacks()
     return url
 
+
 # noinspection PyIncorrectDocstring
-def postSync(content: typing.Union[str, list], *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
+def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, retry: int = 5, find_fallback_on_unavailable: bool = True,
+             find_fallback_on_retry_runout: bool = False):
     """
     Creates a new haste
 
-    :param content: the content to post to hastebin. If this is a list, it will join with a newline.
+    :param content: Union[str, Iterable] - the content to post to hastebin. If this is a list, it will join with a newline.
     :keyword url: the custom URL to post to. Defaults to HasteBin.
     :keyword retry: the number of times to retry. Pass `0` to disable
+    :keyword find_fallback_on_unavailable: Whether or not to find a fallback or give up if the url fails to return.
     :keyword find_fallback_on_retry_runout: if True, instead of raising NoMoreRetries(), find a fallback instead.
+    :raise RuntimeError: requests is not installed or you provided a retry value above 1000 (which would raise recursion error)
+    :raise TypeError: Either the provided `content` was not string/iterable, or you disabled find_..._unavailable.
     :return: the returned URL
     """
+    if retry > 1000:
+        raise RuntimeError("")
     if not requests:
         raise RuntimeError("requests must be installed if you want to be able to run postSync.")
-    if isinstance(content, list):
+    if isinstance(content, typing.Iterable):  # 1.0.6: Made all iterables supported (e.g generators or tuples)
         content = [str(item) for item in content]
         content = "\n".join(content)
     if not isinstance(content, str):
@@ -132,7 +151,7 @@ def postSync(content: typing.Union[str, list], *, url: str = None, retry: int = 
                 print(url, "is returning an invalid response. Finding a Fallback")
                 return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
             key = response.json()["key"]
-        except requests.ConnectionError:
+        except (requests.ConnectionError, ConnectionError):
             print(url, "is unable. Finding a fallback...")
             return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
         except Exception as e:
@@ -143,10 +162,15 @@ def postSync(content: typing.Union[str, list], *, url: str = None, retry: int = 
                 raise NoMoreRetries()
             print(f"Error posting. {retry-1} retries left.")
             retry -= 1
-            return postSync(content, url=url, retry=retry, find_fallback_on_retry_runout=True)
+            if find_fallback_on_unavailable:
+                return postSync(content, url=url, retry=retry, find_fallback_on_unavailable=True,
+                                find_fallback_on_retry_runout=True)
+            else:
+                raise TypeError("Unable to create a haste with the provided URL.")
     return url+"/"+key
 
-async def postAsync(content: typing.Union[str, list], *, url: str = None, retry: int = 5, find_fallback_on_retry_runout: bool = False):
+async def postAsync(content: typing.Union[str, list], *, url: str = None, retry: int = 5, find_fallback_on_unavailable: bool = True,
+                    find_fallback_on_retry_runout: bool = False):
     """The same as :func:postSync, but async."""
     if not aiohttp:
         raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
@@ -169,8 +193,11 @@ async def postAsync(content: typing.Union[str, list], *, url: str = None, retry:
                     return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
                 key = (await response.json())["key"]
         except aiohttp.ClientConnectionError:
-            print(url, "is unavailable. Finding a fallback...")
-            return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
+            if find_fallback_on_unavailable:
+                print(url, "is unavailable. Finding a fallback...")
+                return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
+            else:
+                raise TypeError("Unable to create a haste with the provided URL")
         except Exception as e:
             print(e)
             if retry <= 0:
@@ -180,13 +207,11 @@ async def postAsync(content: typing.Union[str, list], *, url: str = None, retry:
                 raise NoMoreRetries()
             print(f"Error posting. {retry-1} retries left.")
             retry -= 1
-            return await postAsync(content, url=url, retry=retry, find_fallback_on_retry_runout=True)
+            # return await postAsync(content, url=url, retry=retry, find_fallback_on_retry_runout=True)
+            if find_fallback_on_unavailable:
+                return await postAsync(content, url=url, retry=retry, find_fallback_on_unavailable=True,
+                                find_fallback_on_retry_runout=True)
+            else:
+                raise TypeError("Unable to create a haste with the provided URL.")
     return url+"/"+key
 
-# def getSync(url: str):
-#     """Gets the raw text in a hastebin.
-#
-#     The URL __MUST__ be a full url.
-#
-#     e.g: https://hastebin.com/uyovocujug"""
-#     raise NotImplementedError("soon")
