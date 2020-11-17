@@ -38,8 +38,3 @@ def mainSync():
 
 ## Want your haste service to be a fallback?
 Just open an issue, with the URL, and we'll add it!
-
-## Changelog:
-1.0.2:
-* Fixed An AttributeError in the error class
-* Added the retry keyword to post methods. Defaults to 5 retries
