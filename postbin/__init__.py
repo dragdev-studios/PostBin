@@ -115,6 +115,7 @@ def postSync(content: typing.Union[str, list], *, url: str = None, retry: int = 
     if not requests:
         raise RuntimeError("requests must be installed if you want to be able to run postSync.")
     if isinstance(content, list):
+        content = [str(item) for item in content]
         content = "\n".join(content)
     if not isinstance(content, str):
         raise TypeError("Content parameter should be list or string, not " + type(content).__name__)
@@ -150,6 +151,7 @@ async def postAsync(content: typing.Union[str, list], *, url: str = None, retry:
     if not aiohttp:
         raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
     if isinstance(content, list):
+        content = [str(item) for item in content]
         content = "\n".join(content)
     if not isinstance(content, str):
         raise TypeError("Content parameter should be list or string, not " + type(content).__name__)
