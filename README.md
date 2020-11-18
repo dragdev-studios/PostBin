@@ -1,6 +1,9 @@
 # PostBin
 A simple package that allows you to post to haste services.
 
+![Code Quality](https://img.shields.io/codefactor/grade/github/dragdev-studios/PostBin/master)
+![Python package](https://github.com/dragdev-studios/PostBin/workflows/Python%20package/badge.svg)
+
 ## Features:
 * "fallback" system, meaning your pastes always succeed
 * async and sync functionality
@@ -10,6 +13,8 @@ A simple package that allows you to post to haste services.
 There's no real need for a full-fledged module for simply creating pastes. So, I think a quick 2 function module
 does the trick far easier.
 
+*Note: v2 would like to disagree*
+
 ## Installing
 from pip: 
 ```shell script
@@ -18,6 +23,10 @@ $ [python3 -m] pip install postbin
 or from git:
 ```shell script
 $ [python3 -m] pip install git+https://github.com/dragdev-studios/PostBin.git
+# OR
+$ git clone https://github.com/dragdev-studios/PostBin.git
+$ cd postbin
+$ python[3] setup.py build && python[3] setup.py install
 ```
 
 ## Execution
@@ -37,4 +46,14 @@ def mainSync():
 ```
 
 ## Want your haste service to be a fallback?
-Just open an issue, with the URL, and we'll add it!
+Make sure all of the following are true:
+
+1.  `POST /documents` with a text/plain body returns JSON `{"key": "url_part"}` or `{"url": "new_url"}`
+2. Ratelimit is greater than or equal to 5/5s
+3. Ratelimit response is JSON (html is only allowed in extreme circumstances, like if cloudflare responds instead.).
+If `x-ratelimit-reset-after` response headers can be used in replacement of body if required.
+4. `GET /raw/:key` returns the text/plain content of the key
+5. `HEAD /:key` or `HEAD /:raw/key` or `HEAD /documents[/:key]` returns a 200 response, or other information 
+response regarding the status of the service, rather than 404 for not found/
+
+If those are all met, open a PR modifying `_FALLBACKS` to add your site __to the end of the list__.
