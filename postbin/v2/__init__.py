@@ -113,7 +113,7 @@ class AsyncHaste:
                     if response.status not in [200, 201]:  # removed 202: That is processing, not complete.
                         raise HTTPException(response)
                     return (await response.json())["key"]
-        except aiohttp.ServerDisconnectedError as e:
+        except (aiohttp.ServerDisconnectedError, aiohttp.ClientConnectorError) as e:
             raise errors.OfflineServer(None, message="Exception while connecting - assuming dead host.") from e
 
     async def post(self, text: str = None, config: ConfigOptions = ConfigOptions(), *, timeout: float = 30.0,
