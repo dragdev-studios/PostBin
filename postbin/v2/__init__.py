@@ -64,7 +64,9 @@ class AsyncHaste:
             try:
                 async with await self._get_session() as session:
                     async with session.head(url) as response:
-                        # some services may not support HEAD requests,so we can just GET if not
+                        # some services may not support HEAD requests,so we can just GET if not.
+                        # We never download the content anyway, its more saving the server's bandwidth.
+                        # Because we're not assholes.
                         if response.status == 405:
                             async with session.get(url) as response:
                                 last_response = response
@@ -102,11 +104,15 @@ class AsyncHaste:
     async def _post(self, url, text, **kwargs):
         async with await self._get_session() as session:
             async with session.post(url,data=text, **kwargs) as response:
-                if response.status not in [200, 201, 202]:
+                if response.status == 429 and (retry_after:=response.headers.get("retry_after")) or \
+                                                           (retry_after:=response.headers.get("x-retry-after")):
+                    await asyncio.sleep(float(retry_after))
+                    return await self._post(url, text, **kwargs)
+                if response.status not in [200, 201]:  # removed 202: That is processing, not complete.
                     raise HTTPException(response)
                 return (await response.json())["key"]
 
-    async def post(self, text: str = None, config: ConfigOptions = ConfigOptions(), *, timeout: float = 30,
+    async def post(self, text: str = None, config: ConfigOptions = ConfigOptions(), *, timeout: float = 30.0,
                    retries: int = 3, url: str = "auto"):
         """
         Creates a haste URL, returning the URL of the new haste.
@@ -126,3 +132,30 @@ class AsyncHaste:
             url = await self.find_working_fallback(retries)
         res = await asyncio.wait_for(self._post(url+"/documents", text or self.text, headers=_HEADERS), timeout=timeout)
         return res if not config.return_full_url else url+"/"+res
+
+    async def raw(self, key: str, *, url: str = "auto", timeout: float = 30.0, retries_per_url: int = 3):
+        """
+        Gets the raw text of a haste.
+
+        Note that the parameters are different from post, in that they apply per URL fetched (if url is auto)
+
+        :param key: the key (after .tld/, e.g hastebin.com/{key})
+        :param url: the URL to find the haste from. if "auto" (default), will search all fallbacks for it.
+        :param timeout: The timeout to request a document from the servers. If this is hit, instead of raising timeout error, just skips to the next one.
+        :param retries_per_url: how may times to retry a URL (unless it returned 404). set to 0 to disable.
+        :return: the found text, __or None if not found__.
+        """
+        async def get(URL):
+            async with session.get(URL + "/raw/" + key) as response:
+                if response.status == 404:
+                    return None
+                elif response.status == 200:
+                    return await response.text(encoding="utf-8", errors="replace")
+        session = await self._get_session()
+        if url.lower() == "auto":
+            for url in _FALLBACKS:
+                res = await get(url)
+                if res: return res
+            return None
+        else:
+            return await get(url+"/raw/"+key)
