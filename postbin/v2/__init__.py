@@ -122,7 +122,7 @@ class AsyncHaste:
         :param timeout: After how long to stop trying to post to a certain URL, and find a fallback.
         :param retries: How many times to attempt to post to the current URL before finding a fallback.
         :param url: The BASE url to post to. If "auto" (default), this will try each url until it works.
-        :return: the completed URL.
+        :return: the completed URL or just the key if specified in Config.
         """
         session = await self._get_session()
         if url != "auto" and config.test_urls_first:
