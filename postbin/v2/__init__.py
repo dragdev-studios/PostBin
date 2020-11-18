@@ -1,11 +1,10 @@
 import asyncio
 import logging
-import re
 
 import aiohttp
-from postbin.v2.errors import FailedTest, HTTPException
-from postbin.v2 import errors
 
+from postbin.v2 import errors
+from postbin.v2.errors import FailedTest, HTTPException
 
 __version__ = "2.0.1a"
 logging.warning("Postbin v2 has not yet been tested. Proceed with caution.")
@@ -163,3 +162,4 @@ class AsyncHaste:
             return None
         else:
             return await get(url+"/raw/"+key)
+#

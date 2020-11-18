@@ -40,7 +40,7 @@ async def main():
 
 
 # Sync app
-def mainSync():
+def mainSync(): 
     url = postbin.postSync(f"FooBar Bazz 2")
     print(f"Your paste is located at {url}")
 ```

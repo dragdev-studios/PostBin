@@ -1,10 +1,12 @@
+from asyncio import get_event_loop
+
 import pytest
 
 from .. import AsyncHaste, ConfigOptions
 from ..errors import OfflineServer
-from asyncio import get_event_loop
 
 loop = get_event_loop()
+
 
 def post_test():
     from random import shuffle
@@ -25,7 +27,7 @@ def get_test():
     shuffle(chars)
 
     try:
-        cls = AsyncHaste(''.join(chars),verbose=0)
+        cls = AsyncHaste(''.join(chars), verbose=0)
     except:
         raise AssertionError
     else:
@@ -34,14 +36,15 @@ def get_test():
         result2 = loop.run_until_complete(cls.raw(result))
         assert result is not None and result == chars
 
-def test_with_fake_url():
+
+def test_with_fake_url():  #
     from random import shuffle
     chars = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     shuffle(chars)
     chars = ''.join(chars)
 
     try:
-        cls = AsyncHaste(chars,verbose=0)
+        cls = AsyncHaste(chars, verbose=0)
     except:
         raise AssertionError
     else:

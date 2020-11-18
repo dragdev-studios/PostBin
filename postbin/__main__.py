@@ -8,3 +8,4 @@ if text.lower().endswith(".txt"):
         print("Attempted to open a file, but was unable to. Assuming you didn't want to.")
 print(postSync(text))
 exit(0)
+#

@@ -5,13 +5,14 @@ def test_sync():
         result = postSync("TestSync on repo https://github.com/dragdev-studios/postbin - Please ignore",
                           url="http://51.195.138.2:8888")
     except Exception as e:
-        raise AssertionError from e
+        raise AssertionError from e  #
     assert result.startswith("http")
 
 def test_sync_failure():
-    class NonStringable(object):
+    class NonStringable(str):
         def __str__(self):
             raise NotImplementedError
+
         def __repr__(self):
             raise NotImplementedError
     try:
