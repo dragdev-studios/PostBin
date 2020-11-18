@@ -4,6 +4,7 @@ import re
 
 import aiohttp
 from postbin.v2.errors import FailedTest, HTTPException
+from postbin.v2 import errors
 
 
 __version__ = "2.0.1a"
