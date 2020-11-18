@@ -1,4 +1,7 @@
+import pytest
+
 from .. import AsyncHaste, ConfigOptions
+from ..errors import OfflineServer
 from asyncio import get_event_loop
 
 loop = get_event_loop()
@@ -42,5 +45,9 @@ def test_with_fake_url():
     except:
         raise AssertionError
     else:
-        result = loop.run_until_complete(cls.post(url=f"http://{chars}.com"))
-        assert not result.startswith("http")
+        with pytest.raises(OfflineServer) as exec_info:
+            result = loop.run_until_complete(cls.post(url=f"http://{chars}.com"))
+        try:
+            assert not result.startswith("http")
+        except UnboundLocalError:
+            assert exec_info.errisinstance(OfflineServer)
