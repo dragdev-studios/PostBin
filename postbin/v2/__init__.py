@@ -25,7 +25,7 @@ class ConfigOptions:
     """Class similar to **kwargs except takes up less room."""
     def __init__(self, **kwargs):
         self.test_urls_first      = kwargs.pop("test_urls_first", False)
-        self.return_full_url      = kwargs.pop("return_full_url", False)
+        self.return_full_url      = kwargs.pop("return_full_url", True)
 
 
 class AsyncHaste:
