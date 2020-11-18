@@ -30,3 +30,17 @@ def get_test():
         assert result.startswith("http")
         result2 = loop.run_until_complete(cls.raw(result))
         assert result is not None and result == chars
+
+def test_with_fake_url():
+    from random import shuffle
+    chars = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    shuffle(chars)
+    chars = ''.join(chars)
+
+    try:
+        cls = AsyncHaste(chars,verbose=0)
+    except:
+        raise AssertionError
+    else:
+        result = loop.run_until_complete(cls.post(url=f"http://{chars}.com"))
+        assert not result.startswith("http")
