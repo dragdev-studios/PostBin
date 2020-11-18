@@ -102,15 +102,18 @@ class AsyncHaste:
             return
 
     async def _post(self, url, text, **kwargs):
-        async with await self._get_session() as session:
-            async with session.post(url,data=text, **kwargs) as response:
-                if response.status == 429 and (retry_after:=response.headers.get("retry_after")) or \
-                                                           (retry_after:=response.headers.get("x-retry-after")):
-                    await asyncio.sleep(float(retry_after))
-                    return await self._post(url, text, **kwargs)
-                if response.status not in [200, 201]:  # removed 202: That is processing, not complete.
-                    raise HTTPException(response)
-                return (await response.json())["key"]
+        try:
+            async with await self._get_session() as session:
+                async with session.post(url,data=text, **kwargs) as response:
+                    if response.status == 429 and (retry_after:=response.headers.get("retry_after")) or \
+                                                               (retry_after:=response.headers.get("x-retry-after")):
+                        await asyncio.sleep(float(retry_after))
+                        return await self._post(url, text, **kwargs)
+                    if response.status not in [200, 201]:  # removed 202: That is processing, not complete.
+                        raise HTTPException(response)
+                    return (await response.json())["key"]
+        except aiohttp.ServerDisconnectedError as e:
+            raise errors.OfflineServer(None, message="Exception while connecting - assuming dead host.") from e
 
     async def post(self, text: str = None, config: ConfigOptions = ConfigOptions(), *, timeout: float = 30.0,
                    retries: int = 3, url: str = "auto"):
