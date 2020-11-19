@@ -132,8 +132,8 @@ def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, re
         raise RuntimeError("")
     if not requests:
         raise RuntimeError("requests must be installed if you want to be able to run postSync.")
-    if isinstance(content, typing.Iterable) and not isinstance(content,
-                                                               str):  # 1.0.6: Made all iterables supported (e.g generators or tuples)
+    if isinstance(content,
+                  (list, tuple, set, frozenset)):  # 1.0.6: Made all iterables supported (e.g generators or tuples)
         content = [str(item) for item in content]
         content = "\n".join(content)
     if not isinstance(content, str):
@@ -174,7 +174,7 @@ async def postAsync(content: typing.Union[str, list], *, url: str = None, retry:
     """The same as :func:postSync, but async."""
     if not aiohttp:
         raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
-    if isinstance(content, typing.Iterable) and not isinstance(content, str):
+    if isinstance(content, (list, tuple, set, frozenset)):
         content = [str(item) for item in content]
         content = "\n".join(content)
     if not isinstance(content, str):
