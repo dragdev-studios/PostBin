@@ -27,6 +27,7 @@ __import__("logging").info("PostBin v2 is now in development. If you would prefe
                            " \"postbin.v2\".")
 
 _FALLBACKS = [
+    "https://haste.clicksminuteper.net",
     "https://hastebin.com",
     "https://paste.pythondiscord.com",
     "https://haste.unbelievaboat.com",
