@@ -139,7 +139,7 @@ def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, re
         content = "\n".join(content)
     if not isinstance(content, str):
         raise TypeError("Content parameter should be list or string, not " + type(content).__name__)
-    url = url or "https://hastebin.com"
+    url = url or "https://haste.clicksminuteper.net"
     with requests.Session() as session:
         try:
             response = session.post(url+"/documents", data=content)
@@ -156,6 +156,7 @@ def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, re
             print(url, "is unable. Finding a fallback...")
             return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
         except Exception as e:
+            print(f"Exception while POSTing to {url}/documents: {e}\nFinding a fallback...")
             if retry <= 0:
                 if find_fallback_on_retry_runout:
                     print(url, "is unavailable. Finding a fallback...")
@@ -180,7 +181,7 @@ async def postAsync(content: typing.Union[str, list], *, url: str = None, retry:
         content = "\n".join(content)
     if not isinstance(content, str):
         raise TypeError("Content parameter should be list or string, not " + type(content).__name__)
-    url = url or "https://hastebin.com"
+    url = url or "https://haste.clicksminuteper.net"
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url+"/documents", data=content) as response:
