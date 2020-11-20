@@ -1,4 +1,4 @@
-requests~=20
-aiohttp~=3.6
-setuptools~=50.0
-pytest~=6.0
+requests
+aiohttp
+setuptools
+pytest
