@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
     name='PostBin',
-    version='1.0.6',
+    version='1.1.0',
     packages=['postbin', "postbin.v2"],
     url='https://github.com/dragdev-studios/postbin',
-    python_requires=">=3.8",
+    python_requires=">=3.6",
     license='MIT',
     author='EEKIM10',
     author_email='eek@clicksminuteper.net',
