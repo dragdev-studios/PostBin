@@ -12,7 +12,7 @@ setup(
     description='A simple two-function program that POSTs to hastebin',
     long_description=open("README.md").read(),
     long_description_content_type='text/markdown',
-    install_requires=open("./requirements.txt").readlines(),
+    install_requires=open("./requirements.txt").read().split("\n"),
     extras_require={"cli": "webbrowser"}
 )
 #
