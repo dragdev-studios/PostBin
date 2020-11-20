@@ -15,6 +15,12 @@ does the trick far easier.
 
 *Note: v2 would like to disagree*
 
+## [backwards] Compatability
+While postbin tries to support all versions, nothing is guaranteed.
+So far, we actively support python 3.6 through to 3.9, however **you should check the :white_check_mark: or :x: next to the most recent commit** and find your version. if its a check mark, it is supported and will work.
+
+Alternatively, install through pip (below) - pip releases are always guaranteed to be stable on 3.6-3.9.
+
 ## Installing
 from pip: 
 ```shell script
