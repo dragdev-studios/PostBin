@@ -105,8 +105,8 @@ class AsyncHaste:
         try:
             async with await self._get_session() as session:
                 async with session.post(url,data=text, **kwargs) as response:
-                    if response.status == 429 and (retry_after:=response.headers.get("retry_after")) or \
-                                                               (retry_after:=response.headers.get("x-retry-after")):
+                    retry_after = response.headers.get("retry_after") or esponse.headers.get("x-retry-after")
+                    if response.status == 429 and retry_after:
                         await asyncio.sleep(float(retry_after))
                         return await self._post(url, text, **kwargs)
                     if response.status not in [200, 201]:  # removed 202: That is processing, not complete.
@@ -129,7 +129,8 @@ class AsyncHaste:
         """
         session = await self._get_session()
         if url != "auto" and config.test_urls_first:
-            if not (response:=await self._head(url, retries)):
+            response=await self._head(url, retries)
+            if not response:
                 raise FailedTest(response)
         elif url == "auto":
             url = await self.find_working_fallback(retries)
