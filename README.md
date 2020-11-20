@@ -3,6 +3,7 @@ A simple package that allows you to post to haste services.
 
 ![Code Quality](https://img.shields.io/codefactor/grade/github/dragdev-studios/PostBin/master)
 ![Python package](https://github.com/dragdev-studios/PostBin/workflows/Python%20package/badge.svg)
+![Version](https://img.shields.io/pypi/v/postbin)
 
 ## Features:
 * "fallback" system, meaning your pastes always succeed
