@@ -105,7 +105,7 @@ class AsyncHaste:
         try:
             async with await self._get_session() as session:
                 async with session.post(url,data=text, **kwargs) as response:
-                    retry_after = response.headers.get("retry_after") or esponse.headers.get("x-retry-after")
+                    retry_after = response.headers.get("retry_after") or response.headers.get("x-retry-after")
                     if response.status == 429 and retry_after:
                         await asyncio.sleep(float(retry_after))
                         return await self._post(url, text, **kwargs)
