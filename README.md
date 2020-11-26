@@ -37,7 +37,7 @@ So far, we actively support python 3.6 through to 3.9, however always check the 
 | 3.8     | :white_check_mark:| N/A |
 | 3.7     | :white_check_mark:| N/A |
 | 3.6     | :white_check_mark:| N/A |
-| 3.5     | :x:| N/A |
+| 3.5     | :x:               | N/A |
 
 Alternatively, install through pip (below) - pip releases are always guaranteed to be stable on 3.8-3.9.
 
@@ -76,8 +76,8 @@ Make sure all of the following are true:
 
 1.  `POST /documents` with a text/plain body returns JSON `{"key": "url_part"}` or `{"url": "new_url"}`
 2. Ratelimit is greater than or equal to 5/5s
-3. Ratelimit response is JSON (html is only allowed in extreme circumstances, like if cloudflare responds instead.).
-If `x-ratelimit-reset-after` response headers can be used in replacement of body if required.
+3. Ratelimit response is JSON (html is only allowed in extreme circumstances, like if cloudflare responds instead.). 
+`x-ratelimit-reset-after` response headers can be used in replacement of body if required.
 4. `GET /raw/:key` returns the text/plain content of the key
 5. `HEAD /:key` or `HEAD /:raw/key` or `HEAD /documents[/:key]` returns a 200 response, or other information 
 response regarding the status of the service, rather than 404 for not found/
