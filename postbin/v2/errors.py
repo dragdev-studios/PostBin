@@ -44,11 +44,19 @@ class HTTPException(Exception):
     def __repr__(self):
         return f"{self.__class__.__name__}(response={self.response} message={self.message} status={self.status})"
 
+
 class FailedTest(HTTPException):
     """
     Raised when a URL test fails.
     """
     pass
 
+
 class OfflineServer(HTTPException):
     """The server provided wasn't online or valid."""
+
+
+class TextTooLarge(HTTPException):
+    """Raised when the text provided to post was too large.
+
+    Bear in mind most template haste services have a paste size limit of 1mb."""
