@@ -3,7 +3,7 @@ from asyncio import get_event_loop
 import pytest
 
 from .. import AsyncHaste, ConfigOptions
-from ..errors import OfflineServer
+from ..errors import OfflineServer, TextTooLarge
 
 loop = get_event_loop()
 
@@ -54,3 +54,18 @@ def test_with_fake_url():  #
             assert not result.startswith("http")
         except UnboundLocalError:
             assert exec_info.errisinstance(OfflineServer)
+
+
+def test_large_payload():
+    text = "." * 999_999
+    try:
+        cls = AsyncHaste(text, verbose=0)
+    except:
+        raise AssertionError
+    else:
+        with pytest.raises(TextTooLarge) as exec_info:
+            result = loop.run_until_complete(cls.post())
+        try:
+            assert not result.startswith("http")
+        except UnboundLocalError:
+            assert exec_info.errisinstance(TextTooLarge)

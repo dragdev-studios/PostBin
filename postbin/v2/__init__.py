@@ -22,8 +22,9 @@ _FALLBACKS = [
 class ConfigOptions:
     """Class similar to **kwargs except takes up less room."""
     def __init__(self, **kwargs):
-        self.test_urls_first      = kwargs.pop("test_urls_first", False)
-        self.return_full_url      = kwargs.pop("return_full_url", True)
+        self.test_urls_first = kwargs.pop("test_urls_first", False)
+        self.return_full_url = kwargs.pop("return_full_url", True)
+        self.ignore_http_errors = kwargs.pop("ignore_http_errors", False)
 
 
 class AsyncHaste:
@@ -107,6 +108,10 @@ class AsyncHaste:
                     if response.status == 429 and retry_after:
                         await asyncio.sleep(float(retry_after))
                         return await self._post(url, text, **kwargs)
+                    if response.status == 400:
+                        data = await response.json()
+                        if data["message"].lower() == "document exceeds maximum length.":
+                            raise errors.TextTooLarge(response, message=data["message"] + "\nText: " + text)
                     if response.status not in [200, 201]:  # removed 202: That is processing, not complete.
                         raise HTTPException(response)
                     return (await response.json())["key"]
