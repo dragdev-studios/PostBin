@@ -6,7 +6,7 @@ import aiohttp
 from postbin.v2 import errors
 from postbin.v2.errors import FailedTest, HTTPException
 
-__version__ = "2.0.1a"
+__version__ = "2.0.2a"
 logging.warning("Postbin v2 has not yet been tested. Proceed with caution.")
 
 _HEADERS = {"User-Agent": f"PostBin(https://github.com/dragdev-studios/postbin)/{__version__}"}
@@ -17,9 +17,7 @@ _FALLBACKS = [
     "https://haste.unbelievaboat.com",
     "https://hst.sh"
 ]
-# _HASTE_URLS_FOR_REGEX = '|'.join(_FALLBACKS[8:]).replace(".", "\\.")
-# _HASTE_URLS_RAW = "(https://|http://)?({})/(raw/)?(?P<key>.+)".format(_HASTE_URLS_FOR_REGEX)
-# _HASTE_REGEX = re.compile(_HASTE_URLS_RAW)
+
 
 class ConfigOptions:
     """Class similar to **kwargs except takes up less room."""
@@ -112,7 +110,7 @@ class AsyncHaste:
                     if response.status not in [200, 201]:  # removed 202: That is processing, not complete.
                         raise HTTPException(response)
                     return (await response.json())["key"]
-        except (aiohttp.ServerDisconnectedError, aiohttp.ClientConnectorError) as e:
+        except (aiohttp.ServerDisconnectedError, aiohttp.ClientConnectorError, aiohttp.ClientOSError) as e:
             raise errors.OfflineServer(None, message="Exception while connecting - assuming dead host.") from e
 
     async def post(self, text: str = None, config: ConfigOptions = ConfigOptions(), *, timeout: float = 30.0,
@@ -129,15 +127,17 @@ class AsyncHaste:
         """
         session = await self._get_session()
         if url != "auto" and config.test_urls_first:
-            response=await self._head(url, retries)
+            response = await self._head(url, retries)
             if not response:
                 raise FailedTest(response)
         elif url == "auto":
             url = await self.find_working_fallback(retries)
-        res = await asyncio.wait_for(self._post(url+"/documents", text or self.text, headers=_HEADERS), timeout=timeout)
-        return res if not config.return_full_url else url+"/"+res
+        res = await asyncio.wait_for(self._post(url + "/documents", text or self.text, headers=_HEADERS),
+                                     timeout=timeout)
+        return res if not config.return_full_url else url + "/" + res
 
-    async def raw(self, key: str, *, url: str = "auto", timeout: float = 30.0, retries_per_url: int = 3):
+    async def raw(self, key: str, *, url: str = "auto", timeout: float = 30.0, retries_per_url: int = 3,
+                  encoding: str = "utf-8"):
         """
         Gets the raw text of a haste.
 
@@ -147,6 +147,7 @@ class AsyncHaste:
         :param url: the URL to find the haste from. if "auto" (default), will search all fallbacks for it.
         :param timeout: The timeout to request a document from the servers. If this is hit, instead of raising timeout error, just skips to the next one.
         :param retries_per_url: how may times to retry a URL (unless it returned 404). set to 0 to disable.
+        :param encoding: The encoding to encode the text in. Defaults to utf-8. | Version added: 2.0.2a
         :return: the found text, __or None if not found__.
         """
         async def get(URL):
@@ -154,7 +155,7 @@ class AsyncHaste:
                 if response.status == 404:
                     return None
                 elif response.status == 200:
-                    return await response.text(encoding="utf-8", errors="replace")
+                    return await response.text(encoding=encoding or "utf-8", errors="replace")
         session = await self._get_session()
         if url.lower() == "auto":
             for url in _FALLBACKS:

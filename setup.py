@@ -1,8 +1,14 @@
 from setuptools import setup
 
+try:
+    with open("README.md") as rfile:
+        long_description = rfile.read()
+except:
+    long_description = "https://github.com/dragdev-studios/postbin (description failed to load)"
+
 setup(
     name='PostBin',
-    version='1.1.0',
+    version='1.1.1a',
     packages=['postbin', "postbin.v2"],
     url='https://github.com/dragdev-studios/postbin',
     python_requires=">=3.6",
