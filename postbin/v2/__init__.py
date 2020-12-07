@@ -9,7 +9,7 @@ from postbin.v2.errors import FailedTest, HTTPException
 __version__ = "2.0.2a"
 logging.warning("Postbin v2 has not yet been tested. Proceed with caution.")
 
-_HEADERS = {"User-Agent": f"PostBin(https://github.com/dragdev-studios/postbin)/{__version__}"}
+_HEADERS = {"User-Agent": f"PostBin (https://github.com/dragdev-studios/postbin)/{__version__})"}
 _FALLBACKS = [
     "https://hastebin.com",
     "https://mystb.in",
@@ -161,6 +161,7 @@ class AsyncHaste:
                     return None
                 elif response.status == 200:
                     return await response.text(encoding=encoding or "utf-8", errors="replace")
+
         session = await self._get_session()
         if url.lower() == "auto":
             for url in _FALLBACKS:
@@ -168,5 +169,10 @@ class AsyncHaste:
                 if res: return res
             return None
         else:
-            return await get(url+"/raw/"+key)
-#
+            return await get(url + "/raw/" + key)
+
+
+async def postAsync(text: str, *, url: str = "auto", config: ConfigOptions = ConfigOptions(), timeout: float = 30.0,
+                    retries: int = 3):
+    """Alias function for AsyncHaste().post(...)"""
+    return await AsyncHaste().post(text, url=url, config=config, timeout=timeout, retries=retries)
