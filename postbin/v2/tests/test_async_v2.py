@@ -57,7 +57,7 @@ def test_with_fake_url():  #
 
 
 def test_large_payload():
-    text = "." * 999_999
+    text = "." * 100_000_000
     try:
         cls = AsyncHaste(text, verbose=0)
     except:

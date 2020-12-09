@@ -113,6 +113,8 @@ class AsyncHaste:
                         data = await response.json()
                         if data["message"].lower() == "document exceeds maximum length.":
                             raise errors.TextTooLarge(response, message=data["message"] + "\nText: " + text)
+                    elif response.status == 413:
+                        raise errors.TextTooLarge(response, message="Text: " + text)
                     if response.status not in [200, 201]:  # removed 202: That is processing, not complete.
                         raise HTTPException(response)
                     return (await response.json())["key"]
