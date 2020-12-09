@@ -11,6 +11,7 @@ logging.warning("Postbin v2 has not yet been tested. Proceed with caution.")
 
 _HEADERS = {"User-Agent": f"PostBin (https://github.com/dragdev-studios/postbin)/{__version__})"}
 _FALLBACKS = [
+    "https://clicksminuteper.net",
     "https://hastebin.com",
     "https://mystb.in",
     "https://paste.pythondiscord.com",
