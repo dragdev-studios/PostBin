@@ -14,7 +14,7 @@ def post_test():
     shuffle(chars)
 
     try:
-        cls = AsyncHaste(''.join(chars),verbose=0)
+        cls = AsyncHaste(''.join(chars))
     except:
         raise AssertionError
     else:
@@ -27,7 +27,7 @@ def get_test():
     shuffle(chars)
 
     try:
-        cls = AsyncHaste(''.join(chars), verbose=0)
+        cls = AsyncHaste(''.join(chars))
     except:
         raise AssertionError
     else:
@@ -44,7 +44,7 @@ def test_with_fake_url():  #
     chars = ''.join(chars)
 
     try:
-        cls = AsyncHaste(chars, verbose=0)
+        cls = AsyncHaste(chars)
     except:
         raise AssertionError
     else:
@@ -59,7 +59,7 @@ def test_with_fake_url():  #
 def test_large_payload():
     text = "." * 100_000_000
     try:
-        cls = AsyncHaste(text, verbose=0)
+        cls = AsyncHaste(text)
     except:
         raise AssertionError
     else:
