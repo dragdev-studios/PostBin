@@ -34,12 +34,9 @@ class AsyncHaste:
 
     All methods of this class, that need to be, are async.
     """
-    def __init__(self, t: str=None, s: int=None, url: str=None, *, verbose: int = 1, session: aiohttp.ClientSession = None):
+    def __init__(self, t: str = None, session: aiohttp.ClientSession = None):
         """Creates the class. You shouldn't provide arguments (other than [t]ext)"""
-        self.url = url
         self.text = t
-        self.status = s
-        self.verbose = verbose
         self.session = session
 
     async def find_working_fallback(self, retries_per_url: int = 3):
@@ -140,8 +137,12 @@ class AsyncHaste:
                 raise FailedTest(response)
         elif url == "auto":
             url = await self.find_working_fallback(retries)
-        res = await asyncio.wait_for(self._post(url + "/documents", text or self.text, headers=_HEADERS),
-                                     timeout=timeout)
+        try:
+            res = await asyncio.wait_for(self._post(url + "/documents", text or self.text, headers=_HEADERS),
+                                         timeout=timeout)
+        except Exception as e:
+            if config.ignore_http_errors: return ""
+            raise e
         return res if not config.return_full_url else url + "/" + res
 
     async def raw(self, key: str, *, url: str = "auto", timeout: float = 30.0, retries_per_url: int = 3,
@@ -179,3 +180,18 @@ async def postAsync(text: str, *, url: str = "auto", config: ConfigOptions = Con
                     retries: int = 3):
     """Alias function for AsyncHaste().post(...)"""
     return await AsyncHaste().post(text, url=url, config=config, timeout=timeout, retries=retries)
+
+
+def postSync(text: str, *, url: str = "auto", config: ConfigOptions = ConfigOptions(), timeout: float = 30.0,
+             retries: int = 3):
+    """
+    Alias function for SyncHaste().post(...).
+
+    WARNING! This relies on the asyncio event loop NOT being in use. If it is, this returns an asyncio.Task
+    """
+    paster = AsyncHaste(text)
+    f = paster.post(None, config, timeout=timeout, retries=retries, url=url)
+    loop = asyncio.get_event_loop()
+    if loop.is_running():
+        return loop.create_task(f, name="Paste-" + str(id(paster)))
+    return loop.run_until_complete(f)
