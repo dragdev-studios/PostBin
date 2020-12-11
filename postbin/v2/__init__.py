@@ -89,13 +89,15 @@ class AsyncHaste:
 
         :return: Optional[asyncio.Task] - if task is provided, it is closing the aiohttp session.
         """
+        if not hasattr(self, "session") or not self.session or self.session.closed:
+            return
         loop = asyncio.get_event_loop()
         if loop.is_running():
             return loop.create_task(self.session.close(), name="PostBin cleanup task")
         else:
             loop.run_until_complete(self.session.close())  # this could cause issues with other async apps
-                                                           # if the edge-case where it tries to do the same as us
-                                                           # but we got the loop first
+            # if the edge-case where it tries to do the same as us
+            # but we got the loop first
             return
 
     async def _post(self, url, text, **kwargs):
