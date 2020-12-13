@@ -84,7 +84,7 @@ def findFallBackSync(verbose: bool = True):
             if verbose:
                 print("No functional URLs could be found. Are you sure you're online?")
             raise NoFallbacks()
-    return url
+        return url
 
 async def findFallBackAsync(verbose: bool = True):
     """Same as findFallBackSync, but just async."""
@@ -112,11 +112,11 @@ async def findFallBackAsync(verbose: bool = True):
             if verbose:
                 print("No functional URLs could be found. Are you sure you're online?")
             raise NoFallbacks()
-    return url
+        return url
 
 
 # noinspection PyIncorrectDocstring
-def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, retry: int = 5, find_fallback_on_unavailable: bool = True,
+def postSync(content:  str, *, url: str = None, retry: int = 5, find_fallback_on_unavailable: bool = True,
              find_fallback_on_retry_runout: bool = False):
     """
     Creates a new haste
@@ -130,16 +130,10 @@ def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, re
     :raise TypeError: Either the provided `content` was not string/iterable, or you disabled find_..._unavailable.
     :return: the returned URL
     """
-    if retry > 1000:
-        raise RuntimeError("")
     if not requests:
         raise RuntimeError("requests must be installed if you want to be able to run postSync.")
-    if isinstance(content,
-                  (list, tuple, set, frozenset)):  # 1.0.6: Made all iterables supported (e.g generators or tuples)
-        content = [str(item) for item in content]
-        content = "\n".join(content)
     if not isinstance(content, str):
-        raise TypeError("Content parameter should be list or string, not " + type(content).__name__)
+        content = repr(content)
     url = url or "https://haste.clicksminuteper.net"
     with requests.Session() as session:
         try:
@@ -149,7 +143,7 @@ def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, re
                 return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
             if response.status_code != 200:
                 raise ResponseError(response)
-            elif response.headers.get("Content-Type", "").lower() != "application/json":
+            if response.headers.get("Content-Type", "").lower() != "application/json":
                 print(url, "is returning an invalid response. Finding a Fallback")
                 return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
             key = response.json()["key"]
@@ -168,21 +162,16 @@ def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, re
             if find_fallback_on_unavailable:
                 return postSync(content, url=url, retry=retry, find_fallback_on_unavailable=True,
                                 find_fallback_on_retry_runout=True)
-            else:
-                raise TypeError("Unable to create a haste with the provided URL.")
+            raise TypeError("Unable to create a haste with the provided URL.")
     return url+"/"+key
 
-async def postAsync(content: typing.Union[str, list], *, url: str = None, retry: int = 5, find_fallback_on_unavailable: bool = True,
+async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_unavailable: bool = True,
                     find_fallback_on_retry_runout: bool = False):
     """The same as :func:postSync, but async."""
     if not aiohttp:
         raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
-    if isinstance(content, (list, tuple, set, frozenset)):
-        content = [str(item) for item in content]
-        content = "\n".join(content)
     if not isinstance(content, str):
-        raise TypeError("Content parameter should be list or string, not " + type(content).__name__)
-    url = url or "https://haste.clicksminuteper.net"
+        content = repr(content)
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url+"/documents", data=content) as response:
@@ -191,7 +180,7 @@ async def postAsync(content: typing.Union[str, list], *, url: str = None, retry:
                     return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
                 if response.status != 200:
                     raise ResponseError(response)
-                elif response.headers.get("Content-Type", "").lower() != "application/json":
+                if response.headers.get("Content-Type", "").lower() != "application/json":
                     print(url, "is returning an invalid response. Finding a Fallback")
                     return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
                 key = (await response.json())["key"]
@@ -199,8 +188,7 @@ async def postAsync(content: typing.Union[str, list], *, url: str = None, retry:
             if find_fallback_on_unavailable:
                 print(url, "is unavailable. Finding a fallback...")
                 return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
-            else:
-                raise TypeError("Unable to create a haste with the provided URL")
+            raise TypeError("Unable to create a haste with the provided URL")
         except Exception as e:
             print(e)
             if retry <= 0:
@@ -214,7 +202,5 @@ async def postAsync(content: typing.Union[str, list], *, url: str = None, retry:
             if find_fallback_on_unavailable:
                 return await postAsync(content, url=url, retry=retry, find_fallback_on_unavailable=True,
                                 find_fallback_on_retry_runout=True)
-            else:
-                raise TypeError("Unable to create a haste with the provided URL.")
+            raise TypeError("Unable to create a haste with the provided URL.")
     return url+"/"+key
-
