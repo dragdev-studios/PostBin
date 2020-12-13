@@ -33,6 +33,7 @@ _FALLBACKS = [
     "https://haste.unbelievaboat.com",
     "https://mystb.in",
     "https://hst.sh"
+    "https://hasteb.in"
 ]
 #_HASTE_URLS_FOR_REGEX = '|'.join(_FALLBACKS[8:]).replace(".", "\\.")
 # _HASTE_URLS_RAW = "(https://|http://)?({})/(raw/)?(?P<key>.+)".format(_HASTE_URLS_FOR_REGEX)
@@ -58,7 +59,7 @@ class NoMoreRetries(NoFallbacks):
 
 
 def findFallBackSync(verbose: bool = True):
-    """Tries to find a fallback URL, if hastebin.com isn't working."""
+    """Tries to find a fallback URL, if haste.clicksminuteper.net isn't working."""
     if not requests:
         raise RuntimeError("You need to install requests to be able to use findFallBackSync.")
     with requests.Session() as session:
@@ -121,7 +122,7 @@ def postSync(content: typing.Union[str, typing.Iterable], *, url: str = None, re
     Creates a new haste
 
     :param content: Union[str, Iterable] - the content to post to hastebin. If this is a list, it will join with a newline.
-    :keyword url: the custom URL to post to. Defaults to HasteBin.
+    :keyword url: the custom URL to post to. Defaults to CMP Haste.
     :keyword retry: the number of times to retry. Pass `0` to disable
     :keyword find_fallback_on_unavailable: Whether or not to find a fallback or give up if the url fails to return.
     :keyword find_fallback_on_retry_runout: if True, instead of raising NoMoreRetries(), find a fallback instead.
