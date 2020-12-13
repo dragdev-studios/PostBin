@@ -16,7 +16,7 @@ does the trick far easier.
 
 *Note: v2 would like to disagree*
 
-## [backwards] Compatability
+## [backwards] Compatibility
 While postbin tries to support all versions, nothing is guaranteed.
 So far, we actively support python 3.6 through to 3.9, however always check the below table and find your version. if its a check mark, it is supported and will work.
 
@@ -28,7 +28,7 @@ So far, we actively support python 3.6 through to 3.9, however always check the 
 | 3.8     | :white_check_mark:| N/A |
 | 3.7     | :white_check_mark:| N/A |
 | 3.6     | :white_check_mark:| N/A |
-| 3.5     | :x:| N/A |
+| 3.5     | :x:               | N/A |
 
 2.0.1a:
 
