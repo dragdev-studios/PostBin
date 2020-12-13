@@ -16,7 +16,7 @@ _FALLBACKS = [
     "https://mystb.in",
     "https://paste.pythondiscord.com",
     "https://haste.unbelievaboat.com",
-    "https://hst.sh"
+    "https://hst.sh",
     "https://hasteb.in"
 ]
 

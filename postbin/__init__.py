@@ -32,7 +32,7 @@ _FALLBACKS = [
     "https://paste.pythondiscord.com",
     "https://haste.unbelievaboat.com",
     "https://mystb.in",
-    "https://hst.sh"
+    "https://hst.sh",
     "https://hasteb.in"
 ]
 #_HASTE_URLS_FOR_REGEX = '|'.join(_FALLBACKS[8:]).replace(".", "\\.")
