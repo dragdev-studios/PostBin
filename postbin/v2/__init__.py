@@ -44,12 +44,11 @@ class AsyncHaste:
         for url in _FALLBACKS:
             try:
                 working = await self._head(url)
-            except:
+            except aiohttp.ClientResponseError:
                 continue
             else:
                 return url
-        else:
-            raise ConnectionError("Unable to connect anywhere. Are you sure you're online?")
+        raise ConnectionError("Unable to connect anywhere. Are you sure you're online?")
 
     async def _get_session(self) -> aiohttp.ClientSession:
         if not self.session or self.session.closed:
@@ -95,11 +94,10 @@ class AsyncHaste:
         loop = asyncio.get_event_loop()
         if loop.is_running():
             return loop.create_task(self.session.close(), name="PostBin cleanup task")
-        else:
-            loop.run_until_complete(self.session.close())  # this could cause issues with other async apps
-            # if the edge-case where it tries to do the same as us
-            # but we got the loop first
-            return
+        loop.run_until_complete(self.session.close())  # this could cause issues with other async apps
+        # if the edge-case where it tries to do the same as us
+        # but we got the loop first
+        return
 
     async def _post(self, url, text, **kwargs):
         try:
@@ -144,7 +142,8 @@ class AsyncHaste:
             res = await asyncio.wait_for(self._post(url + "/documents", text or self.text, headers=_HEADERS),
                                          timeout=timeout)
         except Exception as e:
-            if config.ignore_http_errors: return ""
+            if config.ignore_http_errors:
+                return ""
             raise e
         return res if not config.return_full_url else url + "/" + res
 
@@ -166,17 +165,17 @@ class AsyncHaste:
             async with session.get(URL + "/raw/" + key) as response:
                 if response.status == 404:
                     return None
-                elif response.status == 200:
+                if response.status == 200:
                     return await response.text(encoding=encoding or "utf-8", errors="replace")
 
         session = await self._get_session()
         if url.lower() == "auto":
-            for url in _FALLBACKS:
-                res = await get(url)
-                if res: return res
+            for _URL in _FALLBACKS:
+                res = await get(_URL)
+                if res:
+                    return res
             return None
-        else:
-            return await get(url + "/raw/" + key)
+        return await get(url + "/raw/" + key)
 
 
 async def postAsync(text: str, *, url: str = "auto", config: ConfigOptions = ConfigOptions(), timeout: float = 30.0,
