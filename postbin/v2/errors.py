@@ -49,7 +49,6 @@ class FailedTest(HTTPException):
     """
     Raised when a URL test fails.
     """
-    pass
 
 
 class OfflineServer(HTTPException):
