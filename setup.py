@@ -8,7 +8,7 @@ except:
 
 setup(
     name='PostBin',
-    version='1.1.1a',
+    version='1.2.0',
     packages=['postbin', "postbin.v2"],
     url='https://github.com/dragdev-studios/postbin',
     python_requires=">=3.6",
