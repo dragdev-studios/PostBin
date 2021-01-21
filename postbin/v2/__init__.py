@@ -43,7 +43,7 @@ class AsyncHaste:
     async def find_working_fallback(self, retries_per_url: int = 3):
         for url in _FALLBACKS:
             try:
-                working = await self._head(url)
+                await self._head(url)
             except aiohttp.ClientResponseError:
                 continue
             else:
@@ -73,7 +73,7 @@ class AsyncHaste:
                             last_response = response
                             response.raise_for_status()
                             return True
-            except:
+            except (aiohttp.ClientError, ConnectionError):
                 await asyncio.sleep(2.5*i)
                 continue
         return last_response
@@ -131,7 +131,6 @@ class AsyncHaste:
         :param url: The BASE url to post to. If "auto" (default), this will try each url until it works.
         :return: the completed URL or just the key if specified in Config.
         """
-        session = await self._get_session()
         if url != "auto" and config.test_urls_first:
             response = await self._head(url, retries)
             if not response:

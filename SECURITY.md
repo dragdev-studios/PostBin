@@ -9,4 +9,4 @@
 
 ## Reporting a Vulnerability
 
-Please send an email to **eek{at}clicksminuteper**, or join [our dev discord server](https://addhq.xyz/api/server/dds-dev) and open a ticket (`t!new`).
+Please email **eek{at}clicksminuteper**, or join [our dev discord server](https://addhq.xyz/api/server/dds-dev) and open a ticket (`t!new`).
