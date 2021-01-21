@@ -76,7 +76,7 @@ class AsyncHaste:
             except:
                 await asyncio.sleep(2.5*i)
                 continue
-        return response
+        return last_response
 
     def __del__(self):
         self.close_session()
