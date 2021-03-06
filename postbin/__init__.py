@@ -172,6 +172,7 @@ async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallb
         raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
     if not isinstance(content, str):
         content = repr(content)
+    url = url or "https://haste.clicksminuteper.net"
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url+"/documents", data=content) as response:
