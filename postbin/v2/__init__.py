@@ -74,7 +74,6 @@ class AsyncHaste:
                             response.raise_for_status()
                             return True
             except (aiohttp.ClientError, ConnectionError):
-                await asyncio.sleep(2.5*i)
                 continue
         return last_response
 
@@ -196,32 +195,3 @@ def postSync(text: str, *, url: str = "auto", config: ConfigOptions = ConfigOpti
     if loop.is_running():
         return loop.create_task(f, name="Paste-" + str(id(paster)))
     return loop.run_until_complete(f)
-
-# this DOES NOT WORK?! WHY?!
-# def set_fallbacks(new: list):
-#     """
-#     Sets your fallbacks to the provided list.
-#     Note that this overwrites the active fallback selection system.
-#
-#     Some validation is performed, like ensuring there's at least 3 fallbacks, and one known one.
-#
-#     :param new: The new list of fallback URLs.
-#     :raises ValueError: Insufficient count of fallbacks
-#     :raises LookupError: No verified fallback was in the list.
-#     :return: None
-#     """
-#     # global _FALLBACKS  # I HATE globals but this seems like the only way for this scope.
-#     if len(new) < 3:
-#         raise ValueError("New fallback list must have at least 3 entries")
-#     if len(new) > 10:
-#         logging.warning("There's a lot of fallbacks here. Note that you only really ever need 4 or 5 in total.")
-#     cleaned = []
-#     for url in new:
-#         if url.endswith("/"):
-#             url = url[:-1]
-#         if not url.startswith("https"):
-#             logging.warning("Provided fallback URL \"{}\" is not HTTPS secured.".format(url))
-#         cleaned.append(url)
-#     global _FALLBACKS
-#     _FALLBACKS = new
-#     return
