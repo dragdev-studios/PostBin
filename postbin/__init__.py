@@ -27,8 +27,7 @@ import time
 
 __import__("logging").info(
     "PostBin v2 is now in development. If you would prefer a more OOP style postbin, consider using"
-    ' "postbin.v2".'
-)
+    ' "postbin.v2".')
 
 _FALLBACKS = [
     "https://paste.pythondiscord.com",
@@ -48,7 +47,6 @@ _FALLBACKS = [
 
 class ResponseError(Exception):
     """Generic class raised when contacting the server failed."""
-
     def __init__(self, response: typing.Union[RR, CR]):
         self.raw_response = response
         if isinstance(response, requests.Response):
@@ -69,8 +67,7 @@ def findFallBackSync(verbose: bool = True):
     """Tries to find a fallback URL, if haste.clicksminuteper.net isn't working."""
     if not requests:
         raise RuntimeError(
-            "You need to install requests to be able to use findFallBackSync."
-        )
+            "You need to install requests to be able to use findFallBackSync.")
     with requests.Session() as session:
         n = 0
         for n, url in enumerate(_FALLBACKS, 1):
@@ -94,7 +91,9 @@ def findFallBackSync(verbose: bool = True):
                 break
         else:
             if verbose:
-                print("No functional URLs could be found. Are you sure you're online?")
+                print(
+                    "No functional URLs could be found. Are you sure you're online?"
+                )
             raise NoFallbacks()
         return url
 
@@ -103,14 +102,15 @@ async def findFallBackAsync(verbose: bool = True):
     """Same as findFallBackSync, but just async."""
     if not aiohttp:
         raise RuntimeError(
-            "You need to install aiohttp to be able to use findFallBackAsync."
-        )
+            "You need to install aiohttp to be able to use findFallBackAsync.")
     async with aiohttp.ClientSession() as session:
         for n, url in enumerate(_FALLBACKS, 1):
             if verbose:
-                print(f"Trying service {n}/{len(_FALLBACKS)} (URL {url})", end="\r")
+                print(f"Trying service {n}/{len(_FALLBACKS)} (URL {url})",
+                      end="\r")
             try:
-                async with session.post(url + "/documents", data="") as response:
+                async with session.post(url + "/documents",
+                                        data="") as response:
                     if response.status != 200:
                         continue
                     else:
@@ -127,7 +127,9 @@ async def findFallBackAsync(verbose: bool = True):
                 continue
         else:
             if verbose:
-                print("No functional URLs could be found. Are you sure you're online?")
+                print(
+                    "No functional URLs could be found. Are you sure you're online?"
+                )
             raise NoFallbacks()
 
 
@@ -171,8 +173,10 @@ def postSync(
                 )
             if response.status_code != 200:
                 raise ResponseError(response)
-            if response.headers.get("Content-Type", "").lower() != "application/json":
-                print(url, "is returning an invalid response. Finding a Fallback")
+            if response.headers.get("Content-Type",
+                                    "").lower() != "application/json":
+                print(url,
+                      "is returning an invalid response. Finding a Fallback")
                 return postSync(
                     content,
                     url=findFallBackSync(True),
@@ -181,9 +185,9 @@ def postSync(
             key = response.json()["key"]
         except (requests.ConnectionError, ConnectionError):
             print(url, "is unable. Finding a fallback...")
-            return postSync(
-                content, url=findFallBackSync(True), find_fallback_on_retry_runout=True
-            )
+            return postSync(content,
+                            url=findFallBackSync(True),
+                            find_fallback_on_retry_runout=True)
         except Exception as e:
             print(
                 f"Exception while POSTing to {url}/documents: {e}\nFinding a fallback..."
@@ -229,7 +233,8 @@ async def postAsync(
     url = url or _FALLBACKS[0]
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(url + "/documents", data=content) as response:
+            async with session.post(url + "/documents",
+                                    data=content) as response:
                 if response.status == 503:
                     print(url, "is unavailable. Finding a fallback...")
                     return await postAsync(
@@ -239,11 +244,11 @@ async def postAsync(
                     )
                 if response.status != 200:
                     raise ResponseError(response)
-                if (
-                    response.headers.get("Content-Type", "").lower()
-                    != "application/json"
-                ):
-                    print(url, "is returning an invalid response. Finding a Fallback")
+                if (response.headers.get("Content-Type", "").lower() !=
+                        "application/json"):
+                    print(
+                        url,
+                        "is returning an invalid response. Finding a Fallback")
                     return await postAsync(
                         content,
                         url=await findFallBackAsync(True),
