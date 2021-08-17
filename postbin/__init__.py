@@ -28,10 +28,10 @@ __import__("logging").info("PostBin v2 is now in development. If you would prefe
 
 _FALLBACKS = [
     "https://paste.pythondiscord.com",
-    "https://hastebin.com",
     "https://haste.unbelievaboat.com",
     "https://mystb.in",
     "https://haste.clicksminuteper.net",
+    "https://hastebin.com",
     "https://hst.sh",
     "https://hasteb.in"
 ]
@@ -91,10 +91,9 @@ async def findFallBackAsync(verbose: bool = True):
     if not aiohttp:
         raise RuntimeError("You need to install aiohttp to be able to use findFallBackAsync.")
     async with aiohttp.ClientSession() as session:
-        n = 0
         for n, url in enumerate(_FALLBACKS, 1):
             if verbose:
-                print(f"Trying service {n}/{len(_FALLBACKS)}",end="\r")
+                print(f"Trying service {n}/{len(_FALLBACKS)} (URL {url})",end="\r")
             try:
                 async with session.post(url+"/documents", data="") as response:
                     if response.status != 200:
@@ -102,7 +101,7 @@ async def findFallBackAsync(verbose: bool = True):
                     else:
                         if verbose:
                             print(f"{url} ({n}) worked. Using that.")
-                        break
+                        return url
             except:
                 if verbose:
                     print(f"Service {n}/{len(_FALLBACKS)} failed. Waiting {n * 1.25}s before trying again.", end="\r")
@@ -112,7 +111,6 @@ async def findFallBackAsync(verbose: bool = True):
             if verbose:
                 print("No functional URLs could be found. Are you sure you're online?")
             raise NoFallbacks()
-        return url
 
 
 # noinspection PyIncorrectDocstring
@@ -185,6 +183,7 @@ async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallb
                     print(url, "is returning an invalid response. Finding a Fallback")
                     return await postAsync(content, url=await findFallBackAsync(True), find_fallback_on_retry_runout=True)
                 key = (await response.json())["key"]
+                return f"{url}/{key}"
         except aiohttp.ClientConnectionError:
             if find_fallback_on_unavailable:
                 print(url, "is unavailable. Finding a fallback...")
