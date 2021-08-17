@@ -23,8 +23,8 @@ try:
 except ImportError:
     aiohttp = None
     CR = None
-import time
 import asyncio
+import time
 
 __import__("logging").info(
     "PostBin v2 is now in development. If you would prefer a more OOP style postbin, consider using"
