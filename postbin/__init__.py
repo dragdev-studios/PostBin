@@ -44,15 +44,18 @@ _FALLBACKS = [
 
 class ResponseError(Exception):
     """Generic class raised when contacting the server failed."""
-    def __init__(self, response: typing.Union[RR,CR]):
+
+    def __init__(self, response: typing.Union[RR, CR]):
         self.raw_response = response
         if isinstance(response, requests.Response):
             self.status = response.status_code
         else:
             self.status = response.status
 
+
 class NoFallbacks(Exception):
     """Raised when no fallback could be contacted."""
+
 
 class NoMoreRetries(NoFallbacks):
     """Raised when we ran out of attempts to post."""
@@ -61,17 +64,19 @@ class NoMoreRetries(NoFallbacks):
 def findFallBackSync(verbose: bool = True):
     """Tries to find a fallback URL, if haste.clicksminuteper.net isn't working."""
     if not requests:
-        raise RuntimeError("You need to install requests to be able to use findFallBackSync.")
+        raise RuntimeError(
+            "You need to install requests to be able to use findFallBackSync.")
     with requests.Session() as session:
         n = 0
         for n, url in enumerate(_FALLBACKS, 1):
             if verbose:
-                print(f"Trying service {n}/{len(_FALLBACKS)}",end="\r")
+                print(f"Trying service {n}/{len(_FALLBACKS)}", end="\r")
             try:
                 response = session.post(url+"/documents", data="")
             except:
                 if verbose:
-                    print(f"Service {n}/{len(_FALLBACKS)} failed. Waiting {n*1.25}s before trying again.", end="\r")
+                    print(
+                        f"Service {n}/{len(_FALLBACKS)} failed. Waiting {n*1.25}s before trying again.", end="\r")
                 time.sleep(n*1.25)
                 continue
             if response.status_code != 200:
@@ -86,14 +91,17 @@ def findFallBackSync(verbose: bool = True):
             raise NoFallbacks()
         return url
 
+
 async def findFallBackAsync(verbose: bool = True):
     """Same as findFallBackSync, but just async."""
     if not aiohttp:
-        raise RuntimeError("You need to install aiohttp to be able to use findFallBackAsync.")
+        raise RuntimeError(
+            "You need to install aiohttp to be able to use findFallBackAsync.")
     async with aiohttp.ClientSession() as session:
         for n, url in enumerate(_FALLBACKS, 1):
             if verbose:
-                print(f"Trying service {n}/{len(_FALLBACKS)} (URL {url})",end="\r")
+                print(
+                    f"Trying service {n}/{len(_FALLBACKS)} (URL {url})", end="\r")
             try:
                 async with session.post(url+"/documents", data="") as response:
                     if response.status != 200:
@@ -104,7 +112,8 @@ async def findFallBackAsync(verbose: bool = True):
                         return url
             except:
                 if verbose:
-                    print(f"Service {n}/{len(_FALLBACKS)} failed. Waiting {n * 1.25}s before trying again.", end="\r")
+                    print(
+                        f"Service {n}/{len(_FALLBACKS)} failed. Waiting {n * 1.25}s before trying again.", end="\r")
                 await asyncio.sleep(n*1.25)
                 continue
         else:
@@ -129,7 +138,8 @@ def postSync(content:  str, *, url: str = None, retry: int = 5, find_fallback_on
     :return: the returned URL
     """
     if not requests:
-        raise RuntimeError("requests must be installed if you want to be able to run postSync.")
+        raise RuntimeError(
+            "requests must be installed if you want to be able to run postSync.")
     if not isinstance(content, str):
         content = repr(content)
     url = url or _FALLBACKS[0]
@@ -149,7 +159,8 @@ def postSync(content:  str, *, url: str = None, retry: int = 5, find_fallback_on
             print(url, "is unable. Finding a fallback...")
             return postSync(content, url=findFallBackSync(True), find_fallback_on_retry_runout=True)
         except Exception as e:
-            print(f"Exception while POSTing to {url}/documents: {e}\nFinding a fallback...")
+            print(
+                f"Exception while POSTing to {url}/documents: {e}\nFinding a fallback...")
             if retry <= 0:
                 if find_fallback_on_retry_runout:
                     print(url, "is unavailable. Finding a fallback...")
@@ -163,11 +174,13 @@ def postSync(content:  str, *, url: str = None, retry: int = 5, find_fallback_on
             raise TypeError("Unable to create a haste with the provided URL.")
     return url+"/"+key
 
+
 async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallback_on_unavailable: bool = True,
                     find_fallback_on_retry_runout: bool = False):
     """The same as :func:postSync, but async."""
     if not aiohttp:
-        raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
+        raise RuntimeError(
+            "aiohttp must be installed if you want to be able to run postAsync.")
     if not isinstance(content, str):
         content = repr(content)
     url = url or _FALLBACKS[0]
@@ -201,6 +214,6 @@ async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallb
             # return await postAsync(content, url=url, retry=retry, find_fallback_on_retry_runout=True)
             if find_fallback_on_unavailable:
                 return await postAsync(content, url=url, retry=retry, find_fallback_on_unavailable=True,
-                                find_fallback_on_retry_runout=True)
+                                       find_fallback_on_retry_runout=True)
             raise TypeError("Unable to create a haste with the provided URL.")
     return url+"/"+key
