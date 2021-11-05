@@ -21,8 +21,8 @@ def test_async():
 
 def test_main():
     loop = get_event_loop()
-    assert post(True, content="\u200b").startswith("http")
-    result = post(content="\u200b")
+    assert post(True, content="a").startswith("http")
+    result = post(False, content="a")
     assert iscoroutine(result)
     assert loop.run_until_complete(result).startswith("http")
 
