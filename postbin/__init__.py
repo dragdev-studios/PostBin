@@ -23,8 +23,6 @@ except ImportError:
     CR = None
 import time
 import asyncio
-__import__("logging").info("PostBin v2 is now in development. If you would prefer a more OOP style postbin, consider using"
-                           " \"postbin.v2\".")
 
 _FALLBACKS = [
     "https://haste.clicksminuteper.net",
@@ -71,8 +69,7 @@ def findFallBackSync(verbose: bool = True):
                 response = session.post(url+"/documents", data="")
             except:
                 if verbose:
-                    print(f"Service {n}/{len(_FALLBACKS)} failed. Waiting {n*1.25}s before trying again.", end="\r")
-                time.sleep(n*1.25)
+                    print(f"Service {n}/{len(_FALLBACKS)} failed. trying again.", end="\r")
                 continue
             if response.status_code != 200:
                 continue
@@ -104,13 +101,34 @@ async def findFallBackAsync(verbose: bool = True):
                         return url
             except:
                 if verbose:
-                    print(f"Service {n}/{len(_FALLBACKS)} failed. Waiting {n * 1.25}s before trying again.", end="\r")
-                await asyncio.sleep(n*1.25)
+                    print(f"Service {n}/{len(_FALLBACKS)} failed. trying again.", end="\r")
                 continue
         else:
             if verbose:
                 print("No functional URLs could be found. Are you sure you're online?")
             raise NoFallbacks()
+
+
+def post(sync: bool = False, *, content: str, url: str = None, retry: int = 5, find_fallback: bool = True):
+    """
+    Creates a new haste.
+
+    If :param:`sync` is ``False``, this function returns a coroutine that you need to await.
+
+    Examples: ::
+
+        # You can run this in ipython or `python3 -m asyncio`.
+        from postbin import post
+        sync_url = post(True, content="Hello")
+
+        async def main():
+            async_url = await post(False, content="Hello")
+        await main()
+    """
+    if sync:
+        return postSync(content, url=url, retry=retry, find_fallback_on_unavailable=find_fallback)
+    else:
+        return postAsync(content, url=url, retry=retry, find_fallback_on_unavailable=find_fallback)
 
 
 # noinspection PyIncorrectDocstring

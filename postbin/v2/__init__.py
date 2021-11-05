@@ -7,7 +7,6 @@ from postbin.v2 import errors
 from postbin.v2.errors import FailedTest, HTTPException
 
 __version__ = "2.0.2a"
-logging.warning("Postbin v2 has not yet been tested. Proceed with caution.")
 
 _HEADERS = {"User-Agent": f"PostBin (https://github.com/dragdev-studios/postbin)/{__version__})"}
 _FALLBACKS = [

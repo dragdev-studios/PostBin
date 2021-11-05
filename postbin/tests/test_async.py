@@ -1,17 +1,30 @@
-from asyncio import get_event_loop
+from sys import version_info
+from asyncio import get_event_loop, iscoroutine
 
-from postbin import postAsync
+from postbin import postAsync, post
+
+
+if version_info >= (3, 10):
+    from asyncio import new_event_loop
+    get_event_loop = new_event_loop
 
 
 def test_async():
     loop = get_event_loop()
     try:
         assert loop.run_until_complete(
-            postAsync("TestSync on repo https://github.com/dragdev-studios/postbin - Please ignore",
-                      url="http://51.195.138.2:8888")
+            postAsync("TestSync on repo https://github.com/dragdev-studios/postbin - Please ignore")
         ).startswith("http")
     except Exception as e:  #
         raise AssertionError from e
+
+
+def test_main():
+    loop = get_event_loop()
+    assert post(True, content="\u200b").startswith("http")
+    result = post(content="\u200b")
+    assert iscoroutine(result)
+    assert loop.run_until_complete(result).startswith("http")
 
 
 # noinspection PyTypeChecker
