@@ -25,13 +25,13 @@ import time
 import asyncio
 
 _FALLBACKS = [
-    "https://haste.clicksminuteper.net",
     "https://paste.pythondiscord.com",
     "https://haste.unbelievaboat.com",
-    "https://mystb.in",
-    "https://hastebin.com",
     "https://hst.sh",
-    "https://hasteb.in"
+    #"https://mystb.in",
+    #"https://hastebin.com",
+    #"https://hasteb.in",
+    #"https://haste.clicksminuteper.net"
 ]
 #_HASTE_URLS_FOR_REGEX = '|'.join(_FALLBACKS[8:]).replace(".", "\\.")
 # _HASTE_URLS_RAW = "(https://|http://)?({})/(raw/)?(?P<key>.+)".format(_HASTE_URLS_FOR_REGEX)
@@ -150,7 +150,7 @@ def postSync(content:  str, *, url: str = None, retry: int = 5, find_fallback_on
         raise RuntimeError("requests must be installed if you want to be able to run postSync.")
     if not isinstance(content, str):
         content = repr(content)
-    url = url or "https://haste.clicksminuteper.net"
+    url = url or FALLBACKS[0]
     with requests.Session() as session:
         try:
             response = session.post(url+"/documents", data=content)
@@ -188,7 +188,7 @@ async def postAsync(content: str, *, url: str = None, retry: int = 5, find_fallb
         raise RuntimeError("aiohttp must be installed if you want to be able to run postAsync.")
     if not isinstance(content, str):
         content = repr(content)
-    url = url or "https://haste.clicksminuteper.net"
+    url = url or FALLBACKS[0]
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url+"/documents", data=content) as response:
